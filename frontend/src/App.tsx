@@ -19,6 +19,13 @@ type Role = 'APPLICANT' | 'OFFICER' | 'ADMIN'
 type User = { id: number; email: string; full_name: string; role: Role }
 type AuthResult = { access_token: string; user: User }
 
+const DEMO_PASSWORD = 'MahaClearDemo2026!'
+const demoAccounts: Array<{ role: Role; label: string; email: string }> = [
+  { role: 'APPLICANT', label: 'Applicant', email: 'applicant@demo.com' },
+  { role: 'OFFICER', label: 'Officer', email: 'officer@demo.com' },
+  { role: 'ADMIN', label: 'Admin', email: 'admin@demo.com' },
+]
+
 const dashboardFor: Record<Role, string> = {
   APPLICANT: '/applicant',
   OFFICER: '/officer',
@@ -39,6 +46,25 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+
+  async function instantDemoLogin(email: string) {
+    setError('')
+    setBusy(true)
+    try {
+      const response = await fetch(apiUrl('/api/auth/login'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: DEMO_PASSWORD }),
+      })
+      if (!response.ok) throw new Error(await readError(response))
+      const result: AuthResult = await response.json()
+      localStorage.setItem('mahaclear_access_token', result.access_token)
+      redirect(dashboardFor[result.user.role])
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Unable to sign in.')
+      setBusy(false)
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -70,7 +96,7 @@ function LoginPage() {
         <button className="primary-button full-width" type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'} <span aria-hidden="true">→</span></button>
       </form>
       <p className="auth-switch">New to MAHACLEAR-AI? <a href="/register">Create an account</a></p>
-      {import.meta.env.DEV && <DemoCredentials />}
+      {import.meta.env.DEV && <DemoCredentials onLogin={instantDemoLogin} busy={busy} />}
     </AuthFrame>
   )
 }
@@ -134,14 +160,18 @@ function AuthFrame({ eyebrow, title, description, children }: { eyebrow: string;
   )
 }
 
-function DemoCredentials() {
+function DemoCredentials({ onLogin, busy }: { onLogin: (email: string) => void; busy: boolean }) {
   return (
     <aside className="demo-box">
-      <strong>Demo accounts</strong>
-      <span>applicant@demo.com</span>
-      <span>officer@demo.com</span>
-      <span>admin@demo.com</span>
-      <small>Password: <code>MahaClearDemo2026!</code></small>
+      <strong>Instant demo login</strong>
+      <div className="demo-login-grid">
+        {demoAccounts.map((account) => (
+          <button key={account.role} className="demo-login-button" type="button" disabled={busy} onClick={() => onLogin(account.email)}>
+            Continue as {account.label} <span aria-hidden="true">→</span>
+          </button>
+        ))}
+      </div>
+      <small>Demo password: <code>{DEMO_PASSWORD}</code></small>
     </aside>
   )
 }
