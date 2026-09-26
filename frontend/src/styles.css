@@ -52,6 +52,12 @@ a { color: var(--green); }
 .auth-switch a:hover { text-decoration: underline; }
 .demo-box { display: grid; gap: 6px; margin-top: 29px; padding: 15px 16px; border: 1px solid #dfe8e2; border-radius: 5px; background: #f0f5f1; color: #728078; font-size: 11px; }
 .demo-box strong { margin-bottom: 2px; color: #3d5147; font-size: 11px; }
+.demo-login-grid { display: grid; gap: 7px; margin-top: 4px; }
+.demo-login-button { display: flex; align-items: center; justify-content: space-between; min-height: 34px; padding: 0 11px; border: 1px solid #cddbd2; border-radius: 4px; background: #fff; color: #355c45; font-size: 11px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+.demo-login-button:hover:not(:disabled) { border-color: #71b58b; background: #f7faf8; transform: translateY(-1px); }
+.demo-login-button:disabled { cursor: wait; opacity: .65; }
+.demo-login-button span { font-size: 14px; }
+
 .demo-box small { margin-top: 4px; color: #53675a; font-size: 11px; letter-spacing: .02em; }
 .demo-box code { color: #355c45; font: 11px 'DM Mono', monospace; }
 .success-panel { margin-top: 27px; padding: 20px; border: 1px solid #d8e8dc; border-radius: 5px; background: #f0f7f1; }
